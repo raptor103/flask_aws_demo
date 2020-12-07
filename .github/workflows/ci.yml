@@ -1,0 +1,66 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Flask application CI/CD test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  run_ci_pipeline:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Test with pytest
+      run: |
+        pytest
+    - name: Lint the code
+      run: |
+        pylint application.py
+
+
+  run_cd_pipeline:
+    runs-on: ubuntu-latest
+    needs: [run_ci_pipeline] # toto jsem doplnil, musi bezet po run_ci_pipeline
+
+    steps:
+
+    - name: Checkout source code
+      uses: actions/checkout@v1
+
+    - name: Generate deployment package
+      run: zip -r deploy.zip . -x '*.git*'
+
+    - name: Deploy to EB
+      uses: einaregilsson/beanstalk-deploy@v14 # toto posktuje hotovy deployment - stahnuto z github marketplace
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }} # uloziljsem v github secrets - info z aws IAM AWS
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # uloziljsem v github secrets - infor z aws IAM AWS
+        application_name: flask_test # z beanstalk prehledu - hlavni strana
+        environment_name: FlaskTest-env # z beanstalk prehledu - hlavni strana
+        version_label: 12
+        region: us-east-2 # doplnit spravne!
+        deployment_package: deploy.zip
