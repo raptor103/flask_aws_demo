@@ -1,7 +1,8 @@
-import requests
-from flask import jsonify
+"""
+Tests Flask app
+"""
 
-def test_application(application, client):
+def test_application(client):
     """
     Tests flask application
     """
