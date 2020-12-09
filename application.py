@@ -10,7 +10,7 @@ def greetings():
     """
     Greetings
     """
-    return 'Ahoj, jak se máš?'
+    return 'Ahoj, jak se máte CÍčka?'
 
 if __name__ == "__main__":
     application.run()
