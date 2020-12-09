@@ -1,5 +1,5 @@
 """
-Runs Flask app
+Runs Flask app.
 """
 
 from flask import Flask
