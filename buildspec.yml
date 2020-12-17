@@ -19,6 +19,6 @@ phases:
       commands:
         - zip -r flask_demo.zip .
 
-  artifacts:
-    files:
-      flask_demo.zip
+artifacts:
+  files:
+    flask_demo.zip
