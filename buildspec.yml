@@ -14,4 +14,4 @@ phases:
   build:
     commands:
       - pytest
-      - pylint
+      - pylint application.py
