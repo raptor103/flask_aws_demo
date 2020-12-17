@@ -16,5 +16,9 @@ phases:
       - pytest
       - pylint application.py
   post_build:
-    commands:
-      - zip -r flask_demo.zip .
+      commands:
+        - zip -r flask_demo.zip .
+
+  artifacts:
+    files:
+      flask_demo.zip
